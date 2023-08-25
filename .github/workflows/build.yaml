@@ -26,9 +26,16 @@ on:
 
 jobs:
   build:
+    
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Show Current Directory
+        run: |
+          echo "Current Directory: $(pwd)"
+          ls -l
+
+    
       - name: Checkout PR
         uses: actions/checkout@v2
         with:
