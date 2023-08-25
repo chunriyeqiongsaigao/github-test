@@ -1,0 +1,84 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: SkyWalking Infra E2E
+description: End-to-End Tesing framework that help to set up, verify E2E tests.
+author: Apache SkyWalking
+inputs:
+  e2e-file:
+    description: File path of e2e file
+    required: true
+  log-dir:
+    description: The container logs directory
+    required: false
+  batch-mode:
+    description: Whether to run in batch mode, all interactive operations are disabled
+    required: false
+    default: 'true'
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go 1.18
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.18
+        cache-dependency-path: ${{ github.action_path }}/go.sum
+    - shell: bash
+      run: make -C $GITHUB_ACTION_PATH install DESTDIR=/usr/local/bin
+    - name: E2E Dir Generator
+      id: 'e2e-dir-generator'
+      shell: bash
+      run: |
+        WORK_DIR="${{ runner.temp }}/skywalking-infra-e2e"
+        echo "work=$WORK_DIR" >> $GITHUB_OUTPUT
+
+        LOG_DIR=""
+        LOG_JOB_DIR=""
+        if [[ "${{ inputs.log-dir }}" == "" ]]
+        then
+          matrix='${{ toJSON(matrix) }}'
+          if [[ "$matrix" == "null" ]]
+          then
+            LOG_DIR="$WORK_DIR/logs"
+            LOG_JOB_DIR="$LOG_DIR/${{ github.job }}"
+          else
+            combine_matrix=$(echo $matrix|jq -r 'to_entries|map(.value)|tostring')
+            # remove json syntax
+            combine_matrix=`echo $combine_matrix|sed -e 's/\[\|\]\|\"//g'`
+            combine_matrix=`echo $combine_matrix|sed -e 's/[\{|\}]//g'`
+            # replace to path
+            combine_matrix=`echo $combine_matrix|sed -e 's/[^A-Za-z0-9_-]/_/g'`
+            LOG_DIR="$WORK_DIR/logs"
+            LOG_JOB_DIR="$LOG_DIR/${{ github.job }}_$combine_matrix"
+          fi
+        elif [[ "${{ inputs.log-dir }}" == /* ]]
+        then
+          LOG_DIR="${{ inputs.log-dir }}"
+          LOG_JOB_DIR="${{ inputs.log-dir }}"
+        else
+          LOG_DIR="$WORK_DIR/${{ inputs.log-dir }}"
+          LOG_JOB_DIR="$WORK_DIR/${{ inputs.log-dir }}"
+        fi
+        echo "log=$LOG_DIR" >> $GITHUB_OUTPUT
+        echo "log-case=$LOG_JOB_DIR" >> $GITHUB_OUTPUT
+        echo "SW_INFRA_E2E_LOG_DIR=$LOG_DIR" >> $GITHUB_ENV
+    - shell: bash
+      run: |
+        e2e run \
+          -c "${{ inputs.e2e-file }}" \
+          --batch-mode "${{ inputs.batch-mode }}" \
+          -w "${{ steps.e2e-dir-generator.outputs.work }}" \
+          -l "${{ steps.e2e-dir-generator.outputs.log-case }}"

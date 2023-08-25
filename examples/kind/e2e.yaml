@@ -1,0 +1,74 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file is used to show how to write configuration files and can be used to test.
+
+setup:
+  env: kind
+  file: kind.yaml
+  steps:
+    - name: install istio
+      command: |
+        # kind k8s cluster is in $TMPDIR
+        cp $TMPDIR/e2e-k8s.config ~/.kube/config
+        export ISTIO_VERSION=1.9.1
+        istioctl version || (curl -L https://istio.io/downloadIstio | sh - && sudo mv $PWD/istio-$ISTIO_VERSION/bin/istioctl /usr/local/bin/)
+        istioctl install -y --set profile=demo \
+            --set meshConfig.defaultConfig.envoyMetricsService.address=skywalking-oap.istio-system:11800 \
+            --set values.telemetry.v2.enabled=false
+        kubectl label namespace default istio-injection=enabled
+    - name: setup manifests
+      path: busybox1.yaml,manifests
+      wait:
+        - namespace: default
+          resource: pod
+          for: condition=Ready
+    - name: setup nginx deployment
+      command: |
+        kubectl create deployment nginx1 --image=nginx
+      wait:
+        - namespace: default
+          resource: deployment/nginx1
+          for: condition=Available
+  kind:
+    expose-ports:
+      - namespace: default
+        resource: deployment/nginx1
+        port: 80
+  timeout: 20m
+
+cleanup:
+  # always never success failure
+  on: always
+
+trigger:
+  action: http
+  interval: 3s
+  times: 5
+  url: http://${deployment_nginx1_host}:${deployment_nginx1_80}/
+  method: GET
+
+verify:
+  # verify with retry strategy
+  retry:
+    # max retry count
+    count: 10
+    # the interval between two attempts, e.g. 10s, 1m.
+    interval: 10s
+  cases:
+    - actual: ../../test/verify/1.actual.yaml
+      expected: ../../test/verify/1.expected.yaml
+    - actual: ../../test/verify/2.actual.yaml
+      expected: ../../test/verify/2.expected.yaml
