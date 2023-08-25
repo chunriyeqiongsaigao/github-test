@@ -30,13 +30,13 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code into the Go module directory
-        uses: actions/checkout
-        with:
-          ref: mainCopy
-      - name: Print current working directory
-        run: |
-          pwd
+        - name: Check out code into the Go module directory
+          uses: actions/checkout@latest
+          with:
+            ref: mainCopy
+        - name: Print current working directory
+          run: |
+            pwd
       # - name: Set up Go 1.18
       #   uses: actions/setup-go@v4
       #   with:
