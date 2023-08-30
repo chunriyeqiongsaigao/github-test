@@ -38,7 +38,7 @@ jobs:
         - name: Run E2E Test
           uses: apache/skywalking-infra-e2e@main      # always prefer to use a revision instead of `main`.
           with:
-            e2e-file: ./examples/compose/e2e.yaml 
+            e2e-file: /home/runner/work/_actions/apache/skywalking-infra-e2e/main/examples/compose/e2e.yaml 
         - name: Print current working directory
           run: |
             pwd
