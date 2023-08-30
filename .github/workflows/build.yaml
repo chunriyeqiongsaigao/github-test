@@ -35,13 +35,16 @@ jobs:
         #   with:
         #     ref: main
         #     path: /home/runner
-        - name: Run E2E Test
-          uses: apache/skywalking-infra-e2e@main      # always prefer to use a revision instead of `main`.
-          with:
-            e2e-file: /home/runner/github-test/github-test/examples/compose/e2e.yaml 
+        # - name: Run E2E Test
+        #   uses: apache/skywalking-infra-e2e@main      # always prefer to use a revision instead of `main`.
+        #   with:
+        #     e2e-file: /home/runner/github-test/github-test/examples/compose/e2e.yaml 
         - name: Print current working directory
           run: |
             pwd
+        - name: Show ls -R
+          run: |
+            ls -R
       # - name: Set up Go 1.18
       #   uses: actions/setup-go@v4
       #   with:
