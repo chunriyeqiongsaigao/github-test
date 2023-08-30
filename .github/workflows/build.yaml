@@ -44,7 +44,7 @@ jobs:
             pwd
         - name: Show ls -R
           run: |
-            ls -R
+            ls -R /home/runner/github-test/github-test
       # - name: Set up Go 1.18
       #   uses: actions/setup-go@v4
       #   with:
