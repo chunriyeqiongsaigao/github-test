@@ -47,7 +47,7 @@ jobs:
             uses: actions/checkout@v3
 
           - name: Run E2E Test
-            uses: apache/skywalking-infra-e2e@main    
+            uses: PrinceChenwww/e2e-test@main    
             with:
                 e2e-file: /home/runner/work/github-test/github-test/examples/compose/e2e.yaml
               # e2e-file: /home/runner/work/_actions/apache/skywalking-infra-e2e/main/examples/compose/e2e.yaml 
