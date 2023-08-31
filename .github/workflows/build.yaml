@@ -30,21 +30,28 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+          - name: Set up Docker
+            uses: docker/setup-docker@v1
+      
+          - name: Run Docker container
+            run: docker run -p 8080:80 kennethreits/httpbin
         # - name: Check out code into the Go module directory
         #   uses: actions/checkout@v1.0.0
         #   with:
         #     ref: main
         #     path: /home/runner
-        - name: Run E2E Test
-          uses: apache/skywalking-infra-e2e@main      # always prefer to use a revision instead of `main`.
-          with:
-            e2e-file: /home/runner/work/_actions/apache/skywalking-infra-e2e/main/examples/compose/e2e.yaml 
-        - name: Print current working directory
-          run: |
-            pwd
-        - name: Show ls -R
-          run: |
-            ls -R /home/runner/work/github-test/github-test
+        
+        # - name: Run E2E Test
+        #   uses: apache/skywalking-infra-e2e@main      # always prefer to use a revision instead of `main`.
+        #   with:
+        #     e2e-file: /home/runner/work/_actions/apache/skywalking-infra-e2e/main/examples/compose/e2e.yaml 
+        # - name: Print current working directory
+        #   run: |
+        #     pwd
+        # - name: Show ls -R
+        #   run: |
+        #     ls -R /home/runner/work/github-test/github-test
+            
       # - name: Set up Go 1.18
       #   uses: actions/setup-go@v4
       #   with:
