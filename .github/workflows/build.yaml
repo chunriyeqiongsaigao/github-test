@@ -32,6 +32,8 @@ jobs:
     steps:
           # - name: Set up Docker
           #   uses: docker/cli@v2
+          - name: Pull Docker image
+            run: docker pull kennethreits/httpbin
       
           - name: Run Docker container
             run: docker run -p 8080:80 kennethreits/httpbin
