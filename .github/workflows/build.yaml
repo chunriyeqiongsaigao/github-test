@@ -30,8 +30,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-          - name: Set up Docker
-            uses: docker/cli@v2
+          # - name: Set up Docker
+          #   uses: docker/cli@v2
       
           - name: Run Docker container
             run: docker run -p 8080:80 kennethreits/httpbin
