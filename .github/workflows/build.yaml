@@ -36,7 +36,11 @@ jobs:
             run: docker pull kennethreitz/httpbin
       
           - name: Run Docker container
-            run: docker run -p 8080:80 kennethreitz/httpbin
+            run: docker run -d -p 8080:80 kennethreitz/httpbin
+
+          - name: Test httpbin
+            run: |
+              curl -s localhost:8080/get -H "accept:application/json"
         # - name: Check out code into the Go module directory
         #   uses: actions/checkout@v1.0.0
         #   with:
