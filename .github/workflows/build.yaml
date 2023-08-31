@@ -38,6 +38,9 @@ jobs:
           - name: Run Docker container
             run: docker run -d -p 8080:80 kennethreitz/httpbin
 
+          - name: Wait for container to start
+            run: sleep 5
+
           - name: Test httpbin
             run: |
               curl -s 127.0.0.1:8080/get -H "accept:application/json"
