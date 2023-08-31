@@ -54,7 +54,7 @@ jobs:
   
       - name: Test httpbin
         run: |
-          curl -s 127.0.0.1:8080/get -H "accept:application/json"
+          curl  -s 127.0.0.1:8080/get -H "accept:application/json"
 
 
       - name: Run E2E Test
