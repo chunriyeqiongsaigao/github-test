@@ -43,6 +43,15 @@ jobs:
             run: |
               curl -s 127.0.0.1:8080/get -H "accept:application/json"
 
+          - name: Check out code into the Go module directory
+            uses: actions/checkout@v3
+
+          - name: Run E2E Test
+            uses: apache/skywalking-infra-e2e@main    
+            with:
+                e2e-file: /home/runner/work/github-test/github-test/examples/compose/e2e.yaml
+              # e2e-file: /home/runner/work/_actions/apache/skywalking-infra-e2e/main/examples/compose/e2e.yaml 
+
               
         # - name: Check out code into the Go module directory
         #   uses: actions/checkout@v1.0.0
